@@ -36,7 +36,6 @@ class API {
 			'time' => $time,
 			'method' => $method,
 			'slots' => $slots
-			'layer' => 4
 		];
 		return $this->send($postdata);
 	}
