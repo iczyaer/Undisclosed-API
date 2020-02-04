@@ -65,7 +65,7 @@ class API {
 		if(is_null($this->curl_handle)){
 			$this->curl_handle = curl_init($api_url);
 			curl_setopt($this->curl_handle, CURLOPT_RETURNTRANSFER, TRUE);
-			curl_setopt($this->curl_handle, CURLOPT_SSL_VERIFYPEER, FALSE)
+			curl_setopt($this->curl_handle, CURLOPT_SSL_VERIFYPEER, FALSE);
 			curl_setopt($this->curl_handle, CURLOPT_ENCODING, "");
 			curl_setopt($this->curl_handle, CURLOPT_MAXREDIRS, 10);
 			curl_setopt($this->curl_handle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
